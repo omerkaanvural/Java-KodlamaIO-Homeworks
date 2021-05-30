@@ -2,28 +2,32 @@ package kodlamaio.hrms.adapters.concretes;
 
 import java.rmi.RemoteException;
 
+import org.springframework.stereotype.Component;
+
 import kodlamaio.hrms.adapters.abstracts.CandidateCheckService;
+import kodlamaio.hrms.core.utilites.result.ErrorResult;
+import kodlamaio.hrms.core.utilites.result.Result;
+import kodlamaio.hrms.core.utilites.result.SuccessResult;
 import kodlamaio.hrms.entities.concretes.Candidate;
 import tr.gov.nvi.tckimlik.WS.KPSPublicSoapProxy;
 
-public abstract class MernisCheckManager implements CandidateCheckService{
+@Component("Mernis")
+public class MernisCheckManager implements CandidateCheckService{
 
 	@Override
-	public boolean checkIfRealPerson(Candidate candidate) {
+	public Result checkIfRealPerson(Candidate candidate) {
 		KPSPublicSoapProxy kpsPublic = new KPSPublicSoapProxy();
 		boolean result = false;
 		try {
-			result = kpsPublic.TCKimlikNoDogrula(candidate.getIdentityNumber(), candidate.getFirstName().toUpperCase(), candidate.getLastName().toUpperCase(), candidate.getBirthYear());
+			result = kpsPublic.TCKimlikNoDogrula(Long.parseLong(candidate.getIdentityNumber()), candidate.getFirstName().toUpperCase(), candidate.getLastName().toUpperCase(), candidate.getBirthYear());
 			if (result) {
-				System.out.println("Mernis doğrulama başarılı.");
-				return true;
+				return new SuccessResult("Mernis doğrulama başarılı.");
 			}
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("Mernis doğrulama başarısız.");
-		return false;
+		return new ErrorResult("Mernis doğrulama başarısız.");
 	}
 
 }

@@ -1,8 +1,11 @@
 package kodlamaio.hrms.adapters.concretes;
 
+import org.springframework.stereotype.Component;
+
 import kodlamaio.hrms.adapters.abstracts.CommonCheckService;
 import kodlamaio.hrms.entities.concretes.User;
 
+@Component("EmailValidation")
 public class EmailValidationManager implements CommonCheckService{
 
 	@Override

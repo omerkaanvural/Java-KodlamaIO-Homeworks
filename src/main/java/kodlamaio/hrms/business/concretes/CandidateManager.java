@@ -4,49 +4,55 @@ package kodlamaio.hrms.business.concretes;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import kodlamaio.hrms.adapters.abstracts.CandidateCheckService;
 import kodlamaio.hrms.business.abstracts.CandidateService;
+import kodlamaio.hrms.core.utilites.result.DataResult;
+import kodlamaio.hrms.core.utilites.result.ErrorResult;
+import kodlamaio.hrms.core.utilites.result.Result;
+import kodlamaio.hrms.core.utilites.result.SuccessDataResult;
+import kodlamaio.hrms.core.utilites.result.SuccessResult;
 import kodlamaio.hrms.dataAccess.abstracts.CandidateDao;
 import kodlamaio.hrms.entities.concretes.Candidate;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 @Service
-@AllArgsConstructor
 @NoArgsConstructor
 public class CandidateManager implements CandidateService{
 	
-	@Autowired
+	
 	private CandidateDao candidateDao;
 	private CandidateCheckService candidateCheckService;
 	
-	
-	public CandidateManager(CandidateCheckService candidateCheckService) {
+	@Autowired
+	public CandidateManager(CandidateDao candidateDao, @Qualifier("FakeMernis") CandidateCheckService candidateCheckService) {
+		this.candidateDao = candidateDao;
 		this.candidateCheckService = candidateCheckService;
 	}
 
 	@Override
-	public void register(Candidate candidate) {
-		List<Integer> tcNoList = getTcNos();
+	public Result register(Candidate candidate) {
+		List<String> tcNoList = getTcNos();
 		List<String> emailList = getEmails();
 		
-		if(candidateCheckService.checkIfRealPerson(candidate)) {
+		if(candidateCheckService.checkIfRealPerson(candidate).isSuccess()) {
 			
 			if(tcNoList.contains(candidate.getIdentityNumber()) || emailList.contains(candidate.getEmail())) {
-				System.out.println("Kayit basarisiz. Tc no veya email zaten kullanımda!");
+				return new ErrorResult("Candidate could not be added. He/She is already in db.");
 			}
 			else {
 				this.candidateDao.save(candidate);
-				System.out.println("kayit basarili.");
 				sendVerificationEmail();
+				return new SuccessResult("candidate is added.");
 			}
-			
 						
 		}
-		else System.out.println(candidate.getFirstName() + "'nın Mernis doğrulaması başarısız.");
+		return  new ErrorResult("Mernis validation failed.");
 	}
 	
 	
@@ -61,9 +67,9 @@ public class CandidateManager implements CandidateService{
 		 return emailList;
 	}
 	
-	public List<Integer> getTcNos() {
+	public List<String> getTcNos() {
 		 List<Candidate> list = new ArrayList<>();
-		 List<Integer> tcNoList = new ArrayList<>();
+		 List<String> tcNoList = new ArrayList<>();
 		 list = this.candidateDao.findAll();
 		 for(Candidate candidate : list) {
 			 tcNoList.add(candidate.getIdentityNumber());
@@ -73,6 +79,13 @@ public class CandidateManager implements CandidateService{
 	
 	public void sendVerificationEmail() {
 		System.out.println("Dogrulama epostası gönderildi.");
+	}
+
+	@Override
+	public DataResult<List<Candidate>> getCandidates() {
+		// TODO Auto-generated method stub
+		return new SuccessDataResult<List<Candidate>>(this.candidateDao.findAll(), "data is listed");
+			
 	}
 
 }
