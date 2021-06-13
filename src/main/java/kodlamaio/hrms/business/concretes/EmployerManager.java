@@ -18,8 +18,7 @@ import kodlamaio.hrms.core.utilites.result.SuccessDataResult;
 import kodlamaio.hrms.core.utilites.result.SuccessResult;
 import kodlamaio.hrms.dataAccess.abstracts.EmployerDao;
 import kodlamaio.hrms.entities.concretes.Employer;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+
 
 @Service
 public class EmployerManager implements EmployerService{

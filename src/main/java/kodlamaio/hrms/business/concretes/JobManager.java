@@ -26,7 +26,7 @@ public class JobManager implements JobService {
 	public void addJob(Job job) {
 		// TODO Auto-generated method stub
 		List<String> jobTitles = getJobs();
-		if(jobTitles.contains(job.getTitle())) {
+		if(jobTitles.contains(job.getPositionName())) {
 			System.out.println("bu is dali zaten listede var!");
 		}
 		
@@ -38,7 +38,7 @@ public class JobManager implements JobService {
 		List<String> jobTitles = new ArrayList<>();
 		
 		for(Job job : jobList) {
-			jobTitles.add(job.getTitle());
+			jobTitles.add(job.getPositionName());
 		}
 		return jobTitles;
 	}
